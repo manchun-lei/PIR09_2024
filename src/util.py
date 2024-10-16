@@ -6,7 +6,7 @@ import os
 import csv
 import numpy as np
 from osgeo import gdal
-import cv2
+from PIL import Image 
 
 def string_to_number(s):
     try:
@@ -104,4 +104,4 @@ def save_srgb_to_48bits_img(img_in,dstfile):
     # save srgb image in  48 bits tif format
     # input: srgb image in float format
     img = (img_in*65535).astype(np.uint16)
-    cv2.imwrite(dstfile,img[...,::-1])
+    Image.fromarray(img_in).save(dstfile)

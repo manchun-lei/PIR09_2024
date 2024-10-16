@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
-
+"""
+@author: Manchun LEI
+"""
 import os
 import csv
 import numpy as np
 from osgeo import gdal
-import cv2
+from PIL import Image 
 
 def string_to_number(s):
     try:
@@ -98,48 +100,8 @@ def load_s2l2a_b4b3b2(root_srcpath,path_name,prod_name,res='10m',area=(0,0,-1,-1
     
     return out,proj,out_tsf,out_dtype,sensor_name
 
-
 def save_srgb_to_48bits_img(img_in,dstfile):
     # save srgb image in  48 bits tif format
     # input: srgb image in float format
     img = (img_in*65535).astype(np.uint16)
-    cv2.imwrite(dstfile,img[...,::-1])
-
-def hist_uniform(img_in,xrange=(0,0),bins=100):
-    # single band img
-    xmin,xmax = xrange
-    if xmin==0 and xmax==0:
-        xmin = np.min(img_in)
-        xmax = np.max(img_in)
-    hist,bin_edges = np.histogram(img_in,bins=bins,range=(xmin,xmax))
-    x = np.linspace(xmin,xmax,bins)
-    return x,hist
-
-def hist_uniform_rgb(img_in,xranges=[(0,0),(0,0),(0,0)],bins=100):
-    # rgb img
-    xs = []
-    hists = []
-    for i in range(3):
-        v = img_in[:,:,i]
-        xrange = xranges[i]
-        x,hist = hist_uniform(v,xrange=xrange,bins=bins)
-        xs.append(x)
-        hists.append(hist)
-    return xs,hists
-
-def cdf_uniform(img_in,xrange=(0,0),bins=100):
-    x,hist = hist_uniform(img_in,xrange=xrange,bins=bins)
-    pdf = hist/np.sum(hist)
-    cdf = np.cumsum(pdf)
-    return x,cdf
-
-def cdf_uniform_rgb(img_in,xranges=[(0,0),(0,0),(0,0)],bins=100):
-    xs = []
-    cdfs = []
-    for i in range(3):
-        v = img_in[:,:,i]
-        xrange = xranges[i]
-        x,cdf = cdf_uniform(v,xrange=xrange,bins=bins)
-        xs.append(x)
-        cdfs.append(cdf)
-    return xs,cdfs
+    Image.fromarray(img_in).save(dstfile)
