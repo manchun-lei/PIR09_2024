@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-
+"""
+@author: Manchun LEI
+"""
 import os
 import sys
 import numpy as np
@@ -9,24 +11,15 @@ _path = os.path.abspath(os.path.join(_current_path,'..','params'))
 sys.path.append(_path)
 from load_params import *
 
-def s2l2a_b4b3b2_to_xyz_d65(img_refl,method,sensor_name):
+def s2l2a_b4b3b2_to_xyz_d65(img_refl,matrix):
    # convert Sentinel-2 Level2 reflectance image B4B3B2 to CIE1931 XYZ D65 image
-   # Input image value should between 0 to 1
-   # input: numpy array [ny,nx,3]
-   # output: numpy array [ny,nx,3]
-    if method=='sovdat19_eq8':
-        matrix = matrix_s2l2ab4b3b2_to_xyzd65_sovdat2019_eq8
-    elif method=='sovdat19_eq9':
-        matrix = matrix_s2l2ab4b3b2_to_xyzd65_sovdat2019_eq9
-    elif method=='new':
-        if sensor_name=='S2A':
-            matrix = matrix_s2al2ab4b3b2_to_xyzd65_lei
-        else:
-            matrix = matrix_s2bl2ab4b3b2_to_xyzd65_lei
+   # Input image value should between 0 to 1  
+   # input: reflectance image, numpy array [ny,nx,3]
+   # output: XYZ image, numpy array [ny,nx,3]
     
     ny,nx,_ = img_refl.shape
-    B = img_refl.reshape(-1, img_refl.shape[2])
-    xyz_d65 =  np.matmul(B,matrix)
+    A = img_refl.reshape(-1, img_refl.shape[2])
+    xyz_d65 =  A@matrix
     
     # theorical max of XYZ D65,(white point)
     xyzw = [0.950489,1,1.08884]
@@ -38,7 +31,7 @@ def s2l2a_b4b3b2_to_xyz_d65(img_refl,method,sensor_name):
 def xyz_d65_to_srgb_lin(img_xyz_d65):
     ny,nx,_ = img_xyz_d65.shape
     B = img_xyz_d65.reshape(-1, img_xyz_d65.shape[2])
-    srgb_lin = np.matmul(B,matrix_xyzd65_to_srgb)
+    srgb_lin = B@matrix_xyzd65_to_srgb
     out = srgb_lin.reshape(ny,nx,_)
     return np.clip(out,0,1)
     

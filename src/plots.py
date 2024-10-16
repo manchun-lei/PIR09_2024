@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+"""
+@author: Manchun LEI
+"""
 import matplotlib.pyplot as plt
 
 def plot_figures(X,Y,xlabels=None,ylabels=None,titles=None,ncol=1,cell_width=1,cell_height=1,

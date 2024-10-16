@@ -99,3 +99,9 @@ def load_s2l2a_b4b3b2(root_srcpath,path_name,prod_name,res='10m',area=(0,0,-1,-1
         out[:,:,i] = np.clip(val,0,1)
     
     return out,proj,out_tsf,out_dtype,sensor_name
+
+def save_srgb_to_48bits_img(img_in,dstfile):
+    # save srgb image in  48 bits tif format
+    # input: srgb image in float format
+    img = (img_in*65535).astype(np.uint16)
+    cv2.imwrite(dstfile,img[...,::-1])
